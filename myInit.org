@@ -1,0 +1,238 @@
+#+TITLE: Emacs Config
+#+author: s-sap
+#+startup: overview
+
+* Theme & Font
+Adds a Custom theme to emacs
+#+begin_src emacs-lisp
+  ; Theme
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/firebelly")
+  (load-theme 'firebelly t)
+
+  (defun load-light-theme() (disable-theme 'firebelly) (enable-theme 'tango))
+  (defun load-dark-theme() (disable-theme 'tango) (enable-theme 'firebelly))
+
+   ; Change the font
+  (add-to-list 'default-frame-alist '(font . "SourceCodePro Semibold 8"))
+
+#+end_src
+
+* Some Customization
+#+begin_src emacs-lisp
+    ;; Removing some default stuff
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+
+    ; Startup buffer
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
+  ;;  Modeline
+    (mood-line-mode)
+
+     ; Enable auto-pair
+    (electric-pair-mode)
+
+     ;Show icons  
+    ;; (all-the-icons-dired-mode)
+
+    ;; For Window
+    (windmove-default-keybindings)
+
+  ; Transparent window
+  (set-frame-parameter (selected-frame) 'alpha '(95 . 70))
+  (add-to-list 'default-frame-alist '(alpha . (85 . 70)))
+
+#+end_src
+** Backup
+  Keep emacs temp backup files in it's own directory
+
+   #+begin_src emacs-lisp
+   (setq backup-directory-alist `(("." . "~/.emacs.d/.emacs_saves")))
+   #+end_src
+
+** Some Scripts
+   #+begin_src emacs-lisp
+     ;; Get Latest News Stories using 'news' script
+     (defun news ()
+       (interactive)
+       (setq TOPIC (read-string "Enter a Topic: "))
+
+       (message " Loading ... ")
+       (set-process-sentinel
+	(start-process "News" nil "news" TOPIC)
+	(lambda (p e)
+	  (when (= 0 (process-exit-status p))
+	    (message " Finished ")
+	    (eww-open-file "/tmp/news.html")))))
+    #+end_src
+* Personal Key Binding
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-t") 'tab-new)
+  (global-set-key (kbd "C-x C-q") 'tab-close)
+  (global-set-key (kbd "C-c c") 'tab-switcher)
+  (global-set-key (kbd "C-c b") 'ibuffer)
+  (global-set-key (kbd "C-c t") 'terminal-dedicated-toggle)
+  (global-set-key (kbd "C-c C-.") 'dired-sidebar-toggle-sidebar)
+  (global-set-key (kbd "M-g") 'magit)
+  (global-set-key (kbd "C-c m") 'yafolding-toggle-element)
+
+#+end_src 
+
+* Org
+  #+begin_src emacs-lisp
+    (setq org-ellipsis " ▼")
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+    (setq org-bullets-bullet-list
+	  '("❂" "✱" "✿" "❇" "❃" "✼" "✽" "✾" "❄" ))
+
+  #+end_src
+
+* Packages
+** Vertico
+  #+begin_src emacs-lisp
+    (vertico-mode)
+    (global-set-key (kbd "C-<tab>") 'switch-to-buffer)
+    (global-set-key (kbd "C-s") 'swiper)
+    ; Add Icons
+    (all-the-icons-completion-mode)
+
+  #+end_src  
+** Multiple Cursors
+  #+begin_src emacs-lisp
+  (require 'multiple-cursors)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-x <mouse-1>") 'mc/add-cursor-on-click)
+  #+end_src
+** Dashboard
+  #+begin_src emacs-lisp
+    (dashboard-setup-startup-hook)
+    (setq dashboard-startup-banner 'official)
+    (setq dashboard-center-content t)
+    (setq dashboard-set-footer nil)
+    (setq dashboard-banner-logo-title nil)  
+    (setq dashboard-show-shortcuts nil)
+    ;; (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+
+    (setq dashboard-items '((projects . 5) (bookmarks . 8) (recents . 8)))
+    (setq dashboard-set-navigator t)
+    (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+    (setq dashboard-item-names '(("Recent Files:" . "Recently opened files:")))
+    (setq dashboard-navigator-buttons
+     `(;; line1
+       ((,(all-the-icons-octicon "rss" :height 1 :v-adjust 0.0)
+	 " Feed"
+	 "Elfeed Feed"
+	 (lambda (&rest _) (elfeed)) ’warning " " "  | ")
+
+	(,(all-the-icons-octicon "terminal" :height 1 :v-adjust 0.0)
+	 " Term"
+	 "Emacs Terminal"
+	 (lambda (&rest _) (terminal)) ’warning "" "")
+
+	)))
+
+    (setq dashboard-init-info
+	  (message (shell-command-to-string "echo -n $(date +%m-%d-%Y:%a) ")))    
+
+  #+end_src   
+** PDF
+  #+begin_src emacs-lisp
+    (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)
+    (setq pdf-view-midnight-colors '("gray60" . "#101010"))
+    (setq pdf-view-midnight-invert nil)
+  #+end_src
+** Elfeed
+  #+begin_src emacs-lisp
+    (setq elfeed-feeds  
+	  '(
+					    ;News Feeds
+	    ("https://hnrss.org/frontpage" TECH)
+	    ("https://grahamcluley.com/feed/" TECH)
+	    ("https://krebsonsecurity.com/feed/" TECH)
+	    ("https://www.theregister.com/headlines.atom" TECH)
+	    ("https://www.theregister.com/security/cyber_crime/headlines.atom" TECH)
+	    ("https://www.theregister.com/security/patches/headlines.atom" TECH)
+	    ("https://www.theregister.com/security/research/headlines.atom" TECH)
+	    ("https://www.theregister.com/software/applications/headlines.atom" TECH)	    
+
+	    ("https://www.bellingcat.com/category/news/rss" BC)
+	    ("https://www.unodc.org/unodc/feed/press-releases.xml" UNODC)
+	    ("https://www.unodc.org/unodc/feed/publications.xml" UNODC)
+	    ("https://www.unodc.org/unodc/feed/stories.xml" UNODC)
+	    ("https://www.justice.gov/feeds/opa/justice-news.xml" DOJ)
+	    ("https://insightcrime.org/category/news/rss" IC)
+	    ("https://insightcrime.org/investigations/rss" IC)
+
+	    ("https://feeds.a.dj.com/rss/RSSWorldNews.xml" WSJ)
+	    ("https://feeds.a.dj.com/rss/RSSWSJD.xml" WSJ)
+	    ("https://www.ft.com/world?format=rss" FT World)
+	    ("https://www.ft.com/technology?format=rss" FT Tech)
+	    ("https://www.economist.com/the-economist-explains/rss.xml" ECO)
+	    ("https://www.economist.com/business/rss.xml" ECO)
+	    ("https://www.economist.com/finance-and-economics/rss.xml" ECO)
+	    ("https://www.economist.com/science-and-technology/rss.xml" ECO)
+	    ("https://www.economist.com/united-states/rss.xml" ECO)
+	    ("https://www.economist.com/asia/rss.xml" ECO)
+	    ("https://www.economist.com/china/rss.xml" ECO)
+	    ("https://www.economist.com/middle-east-and-africa/rss.xml" ECO)
+	    ("https://www.economist.com/international/rss.xml" ECO)
+
+	    ))
+
+    (setq elfeed-search-face-alist
+	  '(
+	    ;; (HN (:foreground "gray53"))
+	    (FT (:foreground "LightCyan4"))
+	    (WSJ (:foreground "gray66"))
+
+	    (UNODC (:foreground "CadetBlue3"))
+	    (DOJ (:foreground "LightSkyBlue3"))
+	    (IC (:foreground "LightSkyBlue1"))
+	    (BC (:foreground "LightSkyBlue2"))
+	    (ECO (:foreground "CadetBlue2"))
+	    (TECH (:foreground "LightSkyBlue3"))
+
+	    (unread (:foreground "gray40")) ))
+
+    (setq-default elfeed-search-filter "@1-days-ago +unread")
+    (setq-default elfeed-search-title-max-width 100)  
+    (setq-default elfeed-search-title-min-width 100)    
+    (elfeed-update)
+  #+end_src
+
+** Yasnippet
+  #+begin_src emacs-lisp
+    (yas-global-mode 1)
+  #+end_src
+** Eglot
+#+begin_src emacs-lisp
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure)
+  (add-hook 'python-mode-hook 'eglot-ensure)
+  (add-hook 'go-mode-hook 'eglot-ensure)
+  (add-hook 'javascript-mode-hook 'eglot-ensure)
+  (add-hook 'rust-mode-hook 'eglot-ensure)
+
+  (global-company-mode)
+
+#+end_src
+
+** From Source
+  #+begin_src emacs-lisp
+    (add-to-list 'load-path (concat user-emacs-directory "lisp/" ))
+    (load "terminal")          ;; Terminal
+    (load "vundo")              ;;Undo Tree
+    (load "yafolding")         ;; Yafolding
+    (yafolding-mode)
+    (load "dired-sidebar")      ;;Side Tree
+    (load "centered-window")     ;Centered Window
+    (centered-window-mode)
+
+  #+end_src
+  
+
+  
