@@ -166,6 +166,7 @@ Adds a Custom theme to emacs
 	    ("https://www.justice.gov/feeds/opa/justice-news.xml" DOJ)
 	    ("https://insightcrime.org/category/news/rss" IC)
 	    ("https://insightcrime.org/investigations/rss" IC)
+	    ("https://theintercept.com/feed/?lang=en" INTER)
 
 	    ("https://feeds.a.dj.com/rss/RSSWorldNews.xml" WSJ)
 	    ("https://feeds.a.dj.com/rss/RSSWSJD.xml" WSJ)
@@ -188,8 +189,8 @@ Adds a Custom theme to emacs
 	    ;; (HN (:foreground "gray53"))
 	    (FT (:foreground "LightCyan4"))
 	    (WSJ (:foreground "gray66"))
-
 	    (UNODC (:foreground "CadetBlue3"))
+	    (INTER (:foreground "CadetBlue2"))
 	    (DOJ (:foreground "LightSkyBlue3"))
 	    (IC (:foreground "LightSkyBlue1"))
 	    (BC (:foreground "LightSkyBlue2"))
@@ -231,7 +232,7 @@ Adds a Custom theme to emacs
     (load "dired-sidebar")      ;;Side Tree
     (load "centered-window")     ;Centered Window
     (centered-window-mode)
-
+    (load "org-bullets")
   #+end_src
   
 
