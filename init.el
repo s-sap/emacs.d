@@ -6,7 +6,6 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
-;; (setq org-agenda-files '("~/Personal/DataLabYT.org"))
 (org-babel-load-file (expand-file-name "~/.emacs.d/myInit.org"))
 
 
@@ -19,8 +18,7 @@
  '(blink-matching-paren t)
  '(centered-window-mode t)
  '(custom-enabled-themes '(firebelly))
- '(custom-safe-themes
-   '(default))
+ '(custom-safe-themes '(default))
  '(cwm-centered-window-width 150)
  '(dashboard-banner-logo-title nil)
  '(dashboard-bookmarks-item-format "%s")
@@ -28,7 +26,6 @@
  '(dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
  '(dashboard-footer "Who the hell uses VIM anyway? Go Evil!")
  '(dashboard-icon-type nil)
- '(dashboard-init-info "09-08-2023")
  '(dashboard-set-file-icons nil)
  '(dashboard-set-footer nil)
  '(dashboard-set-heading-icons t)
@@ -36,12 +33,13 @@
  '(dashboard-show-shortcuts nil)
  '(initial-frame-alist '((fullscreen . maximized)))
  '(package-selected-packages
-   '(bongo pdf-tools dired-subtree mood-line yasnippet vertico projectile org-bullets multiple-cursors elfeed dashboard company all-the-icons-dired all-the-icons-completion))
- '(pdf-view-midnight-colors '("gray60" . "#101010"))
- '(pdf-view-midnight-invert nil)
+   '(simple-modeline swiper pyvenv bongo pdf-tools dired-subtree mood-line yasnippet vertico projectile org-bullets multiple-cursors elfeed dashboard company all-the-icons-dired all-the-icons-completion))
+ '(pdf-view-midnight-colors '("gray60" . "#101010") t)
+ '(pdf-view-midnight-invert nil t)
  '(tab-bar-close-button-show nil)
  '(tab-bar-format
    '(tab-bar-format-history tab-bar-format-tabs tab-bar-separator))
+ '(tab-bar-mode t)
  '(tab-line-new-button-show nil)
  '(vertico-mode t))
 
@@ -56,6 +54,9 @@
  '(elfeed-search-unread-title-face ((t (:foreground "gray50" :weight bold))))
  '(flymake-warning ((t nil)))
  '(fringe ((t (:background "#101010"))))
+ '(tab-bar-tab ((t (:background "#151515" :foreground "#bbbbbb"))))
+ '(tab-bar-tab-group-current ((t (:inherit tab-bar-tab :weight bold))))
+ '(tab-bar-tab-inactive ((t (:background "gray5" :foreground "gray50" :height 0.9))))
  '(vertico-current ((t (:inherit highlight :extend t :background "#303030" :foreground "SeaGreen2" :weight semi-bold))))
  '(yafolding-ellipsis-face ((t nil)) t))
 

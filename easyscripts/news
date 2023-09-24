@@ -3,25 +3,49 @@ import requests
 import sys
 import re, base64
 from os import system
-from stem import Signal
-from stem.control import Controller
 from bs4 import BeautifulSoup
 
 
-FINAL_PAGE = "/tmp/news.html"
-usingTor = True if system('systemctl is-active --quiet tor') == 0 else False
+def extractLinks(TEXT):
+    # Decode only valid Links
+    try:
+        # Extract only the base64 string
+        _temp1 = re.split('/', TEXT)
+        _temp2 = _temp1[-1]+"?"
+        _temp2 = _temp2.split('?')[0]
+        # Decode & Add padding
+        decodeStr = str(base64.b64decode(_temp2 + "=="))
+        # Regex find full url
+        XX = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', decodeStr)
+        # Get the news link
+        return XX[0].split('\\')[0]
+    except Exception:
+        pass
 
+def createHTMLPage(NEWS, PAGE="/tmp/news.html"):
+    F = open(PAGE, "w")
+    F.writelines(f"<h2 style='color:#aaa'> <center> Query: {' '.join(sys.argv[1:])}  |  {len(NEWS)} Stories Found </center></h2><br><br>")
+    F.writelines("<style> body{background-color:#1a1c23} </style><body>")
+    indexN=0
+    for n in NEWS:
+        F.write(f"""<div style='background-color:#1e2028;border-radius:8px;padding:5px;'><center><a href='{n[-1]}' target='_blank' style='color:#aaa;'><h2><span style="float:left;color:#606060;font-size:13px;">[ {indexN} ]</span><span style="float:left;margin-left:2%;color:red;font-size:19px;">{n[2]}</span>{n[0]}<span style="float:right;margin-right:8%;color:#aaa;font-size:19px;">{n[1]}</span></h2></a></center></div><br>""")
+        indexN+=1
+    F.writelines("</body>")
+
+def termRender(Data, Line=10):
+    n = 0
+    for i in Data:
+        print(f"[ {i[2]} ]\n\t | {i[0]} | {i[1]}\n\t | {i[3]}")
+        n += 1
+        if n % Line == 0: input()
+        
 class GNews:
-    def __init__(self):
-        self.Topic = self.getTopic()
-        if self.Topic is None:
-            print("[Error] Topic Argv Missing")
-            exit()
-        self.Url = f"https://news.google.com/search?q={self.Topic}&hl=en-US&gl=US&ceid=US%3Aen"
+    def __init__(self, Topic):        
+        self.Url = f"https://news.google.com/search?q={Topic}&hl=en-US&gl=US&ceid=US%3Aen"
         
     def News(self):
-        s = self.getSession()
         try:
+            s = requests.session()
             headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:111.0)'\
                        'Gecko/20100101 Firefox/111.0',
                        'Accept': 'text/html,application/xhtml+xml,application/xml;'\
@@ -34,132 +58,44 @@ class GNews:
         except Exception as e:
             print(str(e))
 
-    def getSession(self):
-        session = requests.session()
-        if usingTor:
-            # Start a session & Add Tor proxy
-            self.renew_connection()
-            # TO Request URL with SOCKS over TOR
-            session.proxies = {'http':  'socks5://127.0.0.1:9050',
-                               'https': 'socks5://127.0.0.1:9050'}
-            return session
-        else:
-            print("!! NOT Using Tor !!")
-            return session
-
-    def renew_connection(self, pw='123456789'):
-        # signal TOR for a new connection
-        with Controller.from_port(port=9051) as controller:
-            controller.authenticate(password=pw)
-            controller.signal(Signal.NEWNYM)
-
-    def getTopic(self):
-        try:
-            userArgv = sys.argv[1:]
-            if len(userArgv) != 0: return "-".join(sys.argv[1:])
-            else: return None
-        except IndexError:
-            return None
-
-        
-class NewsFormat:
-    def __init__(self):
-        self.HTMLpage = GNews().News()
-        
-    def extractLinks(self, String):
-        # Decode only valid Links
-        try:
-            # Extract only the base64 string
-            _temp1 = re.split('/', String)
-            _temp2 = _temp1[-1]+"?"
-            _temp2 = _temp2.split('?')[0]
-            # Decode & Add padding
-            decodeStr = str(base64.b64decode(_temp2 + "=="))
-            # Regex find full url
-            XX = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', decodeStr)
-            # Get the news link
-            return XX[0].split('\\')[0]
-        except Exception:
-            pass
-
-    def getNews(self):
-        soup = BeautifulSoup(self.HTMLpage, features="html.parser")        
-        link = [self.extractLinks(i['href']) for i in soup.find_all('a', class_="VDXfz")]
+    def getNews(self, toSort=True):
+        '''
+        Use Html parser to get all the needed Data
+        Returns a list news storys
+        '''
+        soup = BeautifulSoup(self.News(), features="html.parser")        
+        link = [extractLinks(i['href']) for i in soup.find_all('a', class_="VDXfz")]
         title = [i.text for i in soup.find_all('h3', class_="ipQwMb")]
         source = [i.text for i in soup.find_all('div', class_="wsLqz")]
-        time = [i.text for i in soup.find_all('time', class_="WW6dff")]
+        time = [i.text for i in soup.find_all('time', class_="WW6dff")]        
 
-        for i in range(len(link)):
-            if "hour" in time[i] or "hours" in time[i] or "minutes" in time[i]:
-                #Add Latest 
-                link.insert(0, link[i])
-                title.insert(0, title[i])
-                source.insert(0, source[i])
-                time.insert(0, time[i])
-                # Remove duplicate
-                link.pop(i)
-                title.pop(i)
-                source.pop(i)
-                time.pop(i)
+        dicData = {"AllNews":[]}
+        for i in range(len(link)): dicData["AllNews"].append([title[i], source[i], time[i], link[i]])
+        if toSort:
+            # Minutes, Hours, Days old News stories
+            all_d, list_d, list_hr, list_min = [],[],[],[]
+            for i in dicData["AllNews"]:
+                if "minute" in i[2] or "minutes" in i[2]: list_min.append(i)
+                elif "hour" in i[2] or "hours" in i[2]: list_hr.append(i)
+                elif "Yesterday" in i[2] or "yesterday" in i[2]: list_d.append(i)
+                else: all_d.append(i)
+            # Sorted Recent
+            return list_min + list_hr + list_d + all_d
 
-        return [link, title, source, time]
-
-    def createNewsPage(self, PAGE="/tmp/news.html"):
-
-        NEWS = self.getNews()        
-        F = open(PAGE, "w")
-
-        if usingTor: F.writelines(f"<h4 style='color:green'> Tor Connected </h4>")
-        else: F.writelines(f"<h4 style='color:red'> !! NOT USING Tor !! </h4>")
-        
-        F.writelines(f"<h2 style='color:#aaa'> <center> Query: {' '.join(sys.argv[1:])}  |  {len(NEWS[0])} Stories Found </center></h2><br><br>")
-        F.writelines("<style> body{background-color:#1a1c23} </style><body>")
-        # Loop through the len of the list
-        for l in range(len(NEWS[0])):            
-            F.write(f"""
-        <div style='background-color:#1e2028;border-radius:8px;padding:5px;'>
-        <center>
-
-        <a href='{NEWS[0][l]}' target='_blank' style='color:#aaa;'>
-         <h2>
-            <span style="float:left;color:#606060;font-size:13px;">
-              [ {l} ]
-            </span>
-            <span style="float:left;margin-left:2%;color:red;font-size:19px;">
-              {NEWS[2][l]}
-            </span>
-            {NEWS[1][l]}
-              <span style="float:right;margin-right:8%;color:#aaa;font-size:19px;">
-                 {NEWS[3][l]}
-              </span>
-          </h2>
-        </a>
-
-        </center>
-        </div>
-        <br>""")
-        F.writelines("</body>")
-        
-
-
-if __name__ == '__main__':
-    NewsFormat().createNewsPage()
+        # Unsorted
+        return dicData["AllNews"]
     
+        
+if __name__ == '__main__':
+    import argparse
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("topic", help="Topic to Search", nargs='+')
+    parser.add_argument("-t", "--term", help="Output in Terminal", action="store_true")
 
-    # def get_current_ip():
-    #     session = requests.session()
+    args = parser.parse_args()
+    topic = "-".join(args.topic)    
+    N = GNews(topic).getNews()
 
-    #     # # TO Request URL with SOCKS over TOR
-    #     session.proxies = {'http':  'socks5://127.0.0.1:9050',
-    #                        'https': 'socks5://127.0.0.1:9050'}
-    #     try:
-    #         r = session.get('http://httpbin.org/ip')
-    #     except Exception as e:
-    #         print(str(e))
-    #     else:
-    #         return r.text
-
-
-    # ip = get_current_ip()
-    # print(ip)
+    if args.term: termRender(N)
+    else: createHTMLPage(N)

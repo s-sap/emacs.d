@@ -48,6 +48,8 @@ flycheck_*.el
 # network security
 /network-security.data
 
+
+myInit.el
 /auto-save-list/
 /snippets/
 /url/

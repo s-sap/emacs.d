@@ -24,17 +24,20 @@ Adds a Custom theme to emacs
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
 
+   ; Tab Mode
+    (tab-bar-mode)
+
     ; Startup buffer
     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 
   ;;  Modeline
-    (mood-line-mode)
+    (simple-modeline-mode)
 
      ; Enable auto-pair
     (electric-pair-mode)
 
      ;Show icons  
-    ;; (all-the-icons-dired-mode)
+    (all-the-icons-dired-mode)
 
     ;; For Window
     (windmove-default-keybindings)
@@ -101,10 +104,11 @@ Adds a Custom theme to emacs
   #+end_src  
 ** Multiple Cursors
   #+begin_src emacs-lisp
-  (require 'multiple-cursors)
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-x <mouse-1>") 'mc/add-cursor-on-click)
+    (require 'multiple-cursors)
+    (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+    (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+    (global-set-key (kbd "C-x <mouse-1>") 'mc/add-cursor-on-click)
+
   #+end_src
 ** Dashboard
   #+begin_src emacs-lisp
