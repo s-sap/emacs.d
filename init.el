@@ -33,7 +33,7 @@
  '(dashboard-show-shortcuts nil)
  '(initial-frame-alist '((fullscreen . maximized)))
  '(package-selected-packages
-   '(simple-modeline swiper pyvenv bongo pdf-tools dired-subtree mood-line yasnippet vertico projectile org-bullets multiple-cursors elfeed dashboard company all-the-icons-dired all-the-icons-completion))
+   '(magit simple-modeline swiper pyvenv bongo pdf-tools dired-subtree mood-line yasnippet vertico projectile org-bullets multiple-cursors elfeed dashboard company all-the-icons-dired all-the-icons-completion))
  '(pdf-view-midnight-colors '("gray60" . "#101010") t)
  '(pdf-view-midnight-invert nil t)
  '(tab-bar-close-button-show nil)

@@ -1,6 +1,6 @@
 #+TITLE: Emacs Config
 #+author: s-sap
-#+startup: overview
+#+startup: overview 
 
 * Theme & Font
 Adds a Custom theme to emacs
@@ -56,18 +56,19 @@ Adds a Custom theme to emacs
 
 ** Some Scripts
    #+begin_src emacs-lisp
-     ;; Get Latest News Stories using 'news' script
+     ; Add Path to Script     
+     (add-to-list 'exec-path "~/.emacs.d/easyscripts/")
+  ;; Get Latest News Stories using 'news' script
      (defun news ()
        (interactive)
        (setq TOPIC (read-string "Enter a Topic: "))
-
        (message " Loading ... ")
        (set-process-sentinel
 	(start-process "News" nil "news" TOPIC)
 	(lambda (p e)
 	  (when (= 0 (process-exit-status p))
 	    (message " Finished ")
-	    (eww-open-file "/tmp/news.html")))))
+	    (eww-open-file "/tmp/news.html")))))     
     #+end_src
 * Personal Key Binding
 #+begin_src emacs-lisp
