@@ -33,7 +33,7 @@
  '(dashboard-show-shortcuts nil)
  '(initial-frame-alist '((fullscreen . maximized)))
  '(package-selected-packages
-   '(magit simple-modeline swiper pyvenv bongo pdf-tools dired-subtree mood-line yasnippet vertico projectile org-bullets multiple-cursors elfeed dashboard company all-the-icons-dired all-the-icons-completion))
+   '(rust-mode vterm magit simple-modeline swiper pyvenv bongo pdf-tools dired-subtree mood-line yasnippet vertico projectile org-bullets multiple-cursors elfeed dashboard company all-the-icons-dired all-the-icons-completion))
  '(pdf-view-midnight-colors '("gray60" . "#101010") t)
  '(pdf-view-midnight-invert nil t)
  '(tab-bar-close-button-show nil)
@@ -56,7 +56,7 @@
  '(fringe ((t (:background "#101010"))))
  '(tab-bar-tab ((t (:background "#151515" :foreground "#bbbbbb"))))
  '(tab-bar-tab-group-current ((t (:inherit tab-bar-tab :weight bold))))
- '(tab-bar-tab-inactive ((t (:background "gray5" :foreground "gray50" :height 0.9))))
+ '(tab-bar-tab-inactive ((t (:background "#303030" :foreground "gray55" :height 0.8))))
  '(vertico-current ((t (:inherit highlight :extend t :background "#303030" :foreground "SeaGreen2" :weight semi-bold))))
  '(yafolding-ellipsis-face ((t nil)) t))
 

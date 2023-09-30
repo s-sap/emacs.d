@@ -2,7 +2,7 @@
 import requests
 import sys
 import re, base64
-from os import system
+import subprocess
 from bs4 import BeautifulSoup
 
 
@@ -31,14 +31,57 @@ def createHTMLPage(NEWS, PAGE="/tmp/news.html"):
         F.write(f"""<div style='background-color:#1e2028;border-radius:8px;padding:5px;'><center><a href='{n[-1]}' target='_blank' style='color:#aaa;'><h2><span style="float:left;color:#606060;font-size:13px;">[ {indexN} ]</span><span style="float:left;margin-left:2%;color:red;font-size:19px;">{n[2]}</span>{n[0]}<span style="float:right;margin-right:8%;color:#aaa;font-size:19px;">{n[1]}</span></h2></a></center></div><br>""")
         indexN+=1
     F.writelines("</body>")
+    subprocess.run(['xdg-open', PAGE])
 
-def termRender(Data, Line=10):
+def termRender(Data, Line=10, titleLen=75):
     n = 0
+    indexUrl = []
     for i in Data:
-        print(f"[ {i[2]} ]\n\t | {i[0]} | {i[1]}\n\t | {i[3]}")
+        # Align String
+        titleFormat = i[0][:titleLen]
+        if len(titleFormat) < titleLen:
+            spaceToAdd = " "*(titleLen - len(titleFormat))
+            titleFormat = titleFormat+spaceToAdd
+        # Render Info
+        print(f"[ {n} ] {titleFormat : ^15}\t{i[2]}\t{i[1]}")
+
+        indexUrl.append(i[-1])
         n += 1
-        if n % Line == 0: input()
-        
+
+        if n % Line == 0:
+            try:
+                choose = list(input(" [ q to Quit ]   [ Enter for More ] \n"))
+                choose = [i for i in choose if i != " "]
+
+                if len(choose) == 0: pass
+                elif choose[0] == "q": exit()                
+                
+                if len(choose) > 1:
+                    for c in choose: subprocess.run(['xdg-open', indexUrl[int(c)]])
+                elif len(choose) == 1:
+                    subprocess.run(['xdg-open', indexUrl[int(choose[0])]])
+                    
+                indexUrl.clear()
+                n = 0
+                
+            except Exception as e:
+                print('Error', e)
+                exit()
+
+def newToFile(dataArr, numOfStories=50, FILE="/home/ss/.emacs.d/easyscripts/news.data"):
+    ''' Get News Data and Write to a file with seperator '''
+    try:
+        with open(FILE, "w") as F:            
+            for d in dataArr[:numOfStories]:
+                if d[-1] is None: d[-1] = ""    # Replace None
+                Stories = "||".join(d)          # Join with '||' seperator                
+                F.write(f"{Stories}\n")        #  Write to a file
+                
+    except Exception as e:
+        print(e)
+        pass
+
+                    
 class GNews:
     def __init__(self, Topic):        
         self.Url = f"https://news.google.com/search?q={Topic}&hl=en-US&gl=US&ceid=US%3Aen"
@@ -81,7 +124,6 @@ class GNews:
                 else: all_d.append(i)
             # Sorted Recent
             return list_min + list_hr + list_d + all_d
-
         # Unsorted
         return dicData["AllNews"]
     
@@ -91,11 +133,15 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("topic", help="Topic to Search", nargs='+')
-    parser.add_argument("-t", "--term", help="Output in Terminal", action="store_true")
-
+    parser.add_argument("-t", help="Output in Terminal", action="store_true")
+    parser.add_argument("-html", help="Output as Html file", action="store_true")    
+    
     args = parser.parse_args()
     topic = "-".join(args.topic)    
     N = GNews(topic).getNews()
 
-    if args.term: termRender(N)
-    else: createHTMLPage(N)
+    print(len(N))
+    
+    if args.t: termRender(N)
+    elif args.html: createHTMLPage(N)
+    else: newToFile(N)
