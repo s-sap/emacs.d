@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: org-add-code
+# key: /orgc
+# --
+
+#+BEGIN_SRC ${1:lang}
+$0
+#+END_SRC

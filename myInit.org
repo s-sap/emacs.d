@@ -31,7 +31,7 @@ Adds a Custom theme to emacs
     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 
   ;;  Modeline
-    (simple-modeline-mode)
+    ;; (simple-modeline-mode)
 
      ; Enable auto-pair
     (electric-pair-mode)
@@ -56,9 +56,10 @@ Adds a Custom theme to emacs
 
 ** Some Scripts
    #+begin_src emacs-lisp
-					     ; Add Path to Script     
+;;    Add Path to Script     
      (add-to-list 'exec-path "~/.emacs.d/easyscripts/")
 
+     ;; ###################################################################################################
      ;; Get Latest News Stories using 'news' script
      (setq news-data "~/.emacs.d/easyscripts/news.data")
      (setq news-buffer-name "news-search")
@@ -89,7 +90,6 @@ Adds a Custom theme to emacs
        (hl-line-mode 1) ;  Enable highlight mode
        ;; (read-only-mode 1); Enable Read Only Mode
        (insert (format "Topic: %s \n\n" topic))  
-
 					     ; List of all stories found
        (setq all-news-stories (read-news-file))
        (setq list-length (length all-news-stories))  ; Length of the list
@@ -113,6 +113,8 @@ Adds a Custom theme to emacs
 	    (get-news-stories TOPIC)
 	    (goto-char (point-min))
 	    ))))
+
+     ;; ###################################################################################################
 
     #+end_src
 * Personal Key Binding
@@ -159,7 +161,7 @@ Adds a Custom theme to emacs
 ** Dashboard
   #+begin_src emacs-lisp
     (dashboard-setup-startup-hook)
-    (setq dashboard-startup-banner 'official)
+    (setq dashboard-startup-banner "~/.emacs.d/true.png")
     (setq dashboard-center-content t)
     (setq dashboard-set-footer nil)
     (setq dashboard-banner-logo-title nil)  
@@ -181,7 +183,7 @@ Adds a Custom theme to emacs
 	(,(all-the-icons-octicon "terminal" :height 1 :v-adjust 0.0)
 	 " Term"
 	 "Emacs Terminal"
-	 (lambda (&rest _) (terminal)) ’warning "" "")
+	 (lambda (&rest _) (vterm)) ’warning "" "")
 
 	)))
 
@@ -220,7 +222,6 @@ Adds a Custom theme to emacs
 
 	    ("https://feeds.a.dj.com/rss/RSSWorldNews.xml" WSJ)
 	    ("https://feeds.a.dj.com/rss/RSSWSJD.xml" WSJ)
-	    ("https://www.ft.com/world?format=rss" FT World)
 	    ("https://www.ft.com/technology?format=rss" FT Tech)
 	    ("https://www.economist.com/the-economist-explains/rss.xml" ECO)
 	    ("https://www.economist.com/business/rss.xml" ECO)
@@ -264,8 +265,6 @@ Adds a Custom theme to emacs
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure)
   (add-hook 'python-mode-hook 'eglot-ensure)
-  (add-hook 'go-mode-hook 'eglot-ensure)
-  (add-hook 'javascript-mode-hook 'eglot-ensure)
   (add-hook 'rust-mode-hook 'eglot-ensure)
 
   (global-company-mode)
@@ -275,7 +274,7 @@ Adds a Custom theme to emacs
 ** From Source
   #+begin_src emacs-lisp
     (add-to-list 'load-path (concat user-emacs-directory "lisp/" ))
-    (load "terminal")          ;; Terminal
+    ;; (load "terminal")          ;; Terminal
     (load "vundo")              ;;Undo Tree
     (load "yafolding")         ;; Yafolding
     (yafolding-mode)

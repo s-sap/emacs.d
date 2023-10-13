@@ -51,6 +51,5 @@ flycheck_*.el
 
 myInit.el
 /auto-save-list/
-/snippets/
 /url/
 /elpa/
