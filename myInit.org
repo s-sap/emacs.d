@@ -9,9 +9,6 @@ Adds a Custom theme to emacs
   (add-to-list 'custom-theme-load-path "~/.emacs.d/firebelly")
   (load-theme 'firebelly t)
 
-  (defun load-light-theme() (disable-theme 'firebelly) (enable-theme 'tango))
-  (defun load-dark-theme() (disable-theme 'tango) (enable-theme 'firebelly))
-
    ; Change the font
   (add-to-list 'default-frame-alist '(font . "SourceCodePro Semibold 8"))
 
@@ -30,14 +27,8 @@ Adds a Custom theme to emacs
     ; Startup buffer
     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
 
-  ;;  Modeline
-    ;; (simple-modeline-mode)
-
      ; Enable auto-pair
     (electric-pair-mode)
-
-     ;Show icons  
-    (all-the-icons-dired-mode)
 
     ;; For Window
     (windmove-default-keybindings)
@@ -54,69 +45,6 @@ Adds a Custom theme to emacs
    (setq backup-directory-alist `(("." . "~/.emacs.d/.emacs_saves")))
    #+end_src
 
-** Some Scripts
-   #+begin_src emacs-lisp
-;;    Add Path to Script     
-     (add-to-list 'exec-path "~/.emacs.d/easyscripts/")
-
-     ;; ###################################################################################################
-     ;; Get Latest News Stories using 'news' script
-     (setq news-data "~/.emacs.d/easyscripts/news.data")
-     (setq news-buffer-name "news-search")
-
-     (defun read-news-file ()  
-       "Return a list of lines from FILE."
-       (with-temp-buffer
-	 (insert-file-contents news-data)
-	 (split-string (buffer-string) "\n" t)))
-
-     (defun open-stories-url (link)
-       "Function to be executed when a link is clicked."
-       (interactive)
-       (browse-url link))
-
-     (defun insert-news-stories (title date link)
-       "Insert a clickable link with LABEL."
-       (insert-button (format " %s\t%s\n" date title link)
-		      'action `(lambda (_) (open-stories-url ,link))
-		      'follow-link t
-		      'face `(:foreground ,"gray65" :height ,1.3)
-		      ))
-
-     (defun get-news-stories (topic)
-       ;; Create a New Buffer
-       (generate-new-buffer news-buffer-name)
-       (switch-to-buffer news-buffer-name)
-       (hl-line-mode 1) ;  Enable highlight mode
-       ;; (read-only-mode 1); Enable Read Only Mode
-       (insert (format "Topic: %s \n\n" topic))  
-					     ; List of all stories found
-       (setq all-news-stories (read-news-file))
-       (setq list-length (length all-news-stories))  ; Length of the list
-					     ; Loop over Data and Insert Stories to Buffer
-       (dotimes (i list-length)
-	 (setq news-list (split-string (nth i all-news-stories) "||"))    ; Split to get Separate Data Points
-					     ; Title, Time, Url
-	 (insert-news-stories (nth 0 news-list)
-			      (nth 2 news-list)
-			      (nth 3 news-list))))
-
-     (defun news-script ()
-       (interactive)
-       (setq TOPIC (read-string "Enter a Topic: "))
-       (message " Loading ... ")
-       (set-process-sentinel
-	(start-process "News" nil "news" TOPIC)
-	(lambda (p e)
-	  (when (= 0 (process-exit-status p))
-	    (message " Finished ")
-	    (get-news-stories TOPIC)
-	    (goto-char (point-min))
-	    ))))
-
-     ;; ###################################################################################################
-
-    #+end_src
 * Personal Key Binding
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-t") 'tab-new)
@@ -161,27 +89,25 @@ Adds a Custom theme to emacs
 ** Dashboard
   #+begin_src emacs-lisp
     (dashboard-setup-startup-hook)
-    (setq dashboard-startup-banner "~/.emacs.d/true.png")
+    ;; (setq dashboard-startup-banner "~/.emacs.d/true.png")
     (setq dashboard-center-content t)
     (setq dashboard-set-footer nil)
     (setq dashboard-banner-logo-title nil)  
     (setq dashboard-show-shortcuts nil)
-    ;; (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
 
-    (setq dashboard-items '((projects . 5) (bookmarks . 8) (recents . 8)))
+    (setq dashboard-items '((projects . 5) (bookmarks . 8) (recents . 10)))
     (setq dashboard-set-navigator t)
     (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
     (setq dashboard-item-names '(("Recent Files:" . "Recently opened files:")))
     (setq dashboard-navigator-buttons
      `(;; line1
        ((,(all-the-icons-octicon "rss" :height 1 :v-adjust 0.0)
-	 " Feed"
+	 " Feed "
 	 "Elfeed Feed"
-	 (lambda (&rest _) (elfeed)) ’warning " " "  | ")
+	 (lambda (&rest _) (elfeed)) ’warning "" " ‖ ")
 
 	(,(all-the-icons-octicon "terminal" :height 1 :v-adjust 0.0)
-	 " Term"
+	 " Term "
 	 "Emacs Terminal"
 	 (lambda (&rest _) (vterm)) ’warning "" "")
 
@@ -202,7 +128,7 @@ Adds a Custom theme to emacs
     (setq elfeed-feeds  
 	  '(
 					    ;News Feeds
-	    ("https://hnrss.org/frontpage" TECH)
+	    ("https://hnrss.org/frontpage" HN)
 	    ("https://grahamcluley.com/feed/" TECH)
 	    ("https://krebsonsecurity.com/feed/" TECH)
 	    ("https://www.theregister.com/headlines.atom" TECH)
@@ -212,16 +138,9 @@ Adds a Custom theme to emacs
 	    ("https://www.theregister.com/software/applications/headlines.atom" TECH)	    
 
 	    ("https://www.bellingcat.com/category/news/rss" BC)
-	    ("https://www.unodc.org/unodc/feed/press-releases.xml" UNODC)
-	    ("https://www.unodc.org/unodc/feed/publications.xml" UNODC)
-	    ("https://www.unodc.org/unodc/feed/stories.xml" UNODC)
-	    ("https://www.justice.gov/feeds/opa/justice-news.xml" DOJ)
 	    ("https://insightcrime.org/category/news/rss" IC)
 	    ("https://insightcrime.org/investigations/rss" IC)
-	    ("https://theintercept.com/feed/?lang=en" INTER)
-
-	    ("https://feeds.a.dj.com/rss/RSSWorldNews.xml" WSJ)
-	    ("https://feeds.a.dj.com/rss/RSSWSJD.xml" WSJ)
+	    ("https://theintercept.com/feed/?lang=en" TECH)
 	    ("https://www.ft.com/technology?format=rss" FT Tech)
 	    ("https://www.economist.com/the-economist-explains/rss.xml" ECO)
 	    ("https://www.economist.com/business/rss.xml" ECO)
@@ -237,12 +156,8 @@ Adds a Custom theme to emacs
 
     (setq elfeed-search-face-alist
 	  '(
-	    ;; (HN (:foreground "gray53"))
+	    (HN (:foreground "gray53"))
 	    (FT (:foreground "LightCyan4"))
-	    (WSJ (:foreground "gray66"))
-	    (UNODC (:foreground "CadetBlue3"))
-	    (INTER (:foreground "CadetBlue2"))
-	    (DOJ (:foreground "LightSkyBlue3"))
 	    (IC (:foreground "LightSkyBlue1"))
 	    (BC (:foreground "LightSkyBlue2"))
 	    (ECO (:foreground "CadetBlue2"))
@@ -274,14 +189,24 @@ Adds a Custom theme to emacs
 ** From Source
   #+begin_src emacs-lisp
     (add-to-list 'load-path (concat user-emacs-directory "lisp/" ))
-    ;; (load "terminal")          ;; Terminal
-    (load "vundo")              ;;Undo Tree
-    (load "yafolding")         ;; Yafolding
-    (yafolding-mode)
-    (load "dired-sidebar")      ;;Side Tree
-    (load "centered-window")     ;Centered Window
-    (centered-window-mode)
     (load "org-bullets")
+    (load "vundo")              ;;Undo Tree
+
+    ;; Directory Tree Sidebar
+    (load "dired-subtree")
+    (load "dired-sidebar")
+    ;; Centered Window
+    (load "centered-window")
+    (centered-window-mode)
+     ;; Yafolding
+    (load "yafolding")
+    (yafolding-mode)
+
+    (load "all-the-icons-dired")
+    (all-the-icons-dired-mode)
+
+    (load "news-script")        ; Script for news
+
   #+end_src
   
 
