@@ -1,12 +1,34 @@
 ;; [ Emacs Config ]
 
+; list the repositories containing them
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
 
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+
+; list the packages you want
+(setq package-list '(magit vertico
+		      multiple-cursors dashboard
+		      elfeed all-the-icons
+		      all-the-icons-completion eglot company
+		      dired-hacks-utils))
+
+; activate all the packages (in particular autoloads)
 (package-initialize)
 
+; fetch the list of packages available 
+(unless package-archive-contents
+  (package-refresh-contents))
+
+; install the missing packages
+(dolist (package package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
+
+
 (org-babel-load-file (expand-file-name "~/.emacs.d/myInit.org"))
+
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

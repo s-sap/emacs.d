@@ -171,10 +171,6 @@ Adds a Custom theme to emacs
     (elfeed-update)
   #+end_src
 
-** Yasnippet
-  #+begin_src emacs-lisp
-    (yas-global-mode 1)
-  #+end_src
 ** Eglot
 #+begin_src emacs-lisp
   (add-hook 'c-mode-hook 'eglot-ensure)
@@ -204,8 +200,6 @@ Adds a Custom theme to emacs
 
     (load "all-the-icons-dired")
     (all-the-icons-dired-mode)
-
-    (load "news-script")        ; Script for news
 
   #+end_src
   
